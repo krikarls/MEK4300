@@ -14,18 +14,18 @@ u = TrialFunction(V)					# define trail- and test function
 v = TestFunction(V)
 
 # define boundary conditions as python functions
+def bottom(x, on_boundary):
+	return near(x[0],-h) and on_boundary
 
 def top(x, on_boundary):
 	return near(x[0],h) and on_boundary
-
-def bottom(x, on_boundary):
-	return near(x[0],-h) and on_boundary
 
 BCs = [DirichletBC(V, 0, bottom), DirichletBC(V, U, top)]
 
 u_ = Function(V)
 
-solve(-inner(grad(u), grad(v))*dx ==  Constant(0)*v*dx, u_ , bcs=BCs)
+solve(-inner(grad(u), grad(v))*dx ==  Constant(0)*v*dx, u_ , bcs=BCs)	# solving the variational problem
+
 u_exact = project(Expression("U/2*(1+x[0]/h)", U=U, h=h), V)
 
 plot(u_ , title="Couette flow")
