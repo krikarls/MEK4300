@@ -4,7 +4,7 @@
 from dolfin import *
 
 N = 10	 # number of elements
-h = 1	 # channel hight
+h = 1.0	 # channel hight
 U = 1.0  # upper plate velocity
 
 mesh = IntervalMesh(N, -h, h)			# create mesh
@@ -29,6 +29,5 @@ solve(-inner(grad(u), grad(v))*dx ==  Constant(0)*v*dx, u_ , bcs=BCs)	# solving 
 u_exact = project(Expression("U/2*(1+x[0]/h)", U=U, h=h), V)
 
 plot(u_ , title="Couette flow")
-interactive()   
 plot(u_ - u_exact , title="Absolute error")
 interactive()   
