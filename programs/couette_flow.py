@@ -28,9 +28,17 @@ solve(-inner(grad(u), grad(v))*dx ==  Constant(0)*v*dx, u_ , bcs=BCs)	# solving 
 
 u_exact = project(Expression("U/2*(1+x[0]/h)", U=U, h=h), V)
 
-plot(u_ , title="Couette flow")
-plot(u_ - u_exact , title="Absolute error")
-interactive()   
+#plot(u_ , title="Couette flow")
+#plot(u_ - u_exact , title="Absolute error")		# had problems using FEniCS plotting 
+#interactive()   
 
-print u_.vector().array() - u_exact.vector().array()
-print u_exact.vector().array()
+import matplotlib.pyplot as plt
+
+plt.plot(u_.vector().array() - u_exact.vector().array())
+plt.show()
+plt.plot(u_.vector().array())
+plt.show()
+
+
+
+
