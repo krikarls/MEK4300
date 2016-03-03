@@ -1,0 +1,11 @@
+
+
+TRIANGLE:
+
+Lagrange, deg=1
+Errornorm:  4.78036467733e-05
+Absolute error in flux:  0.000274474915103
+
+Lagrange, deg=2
+Errornorm:  2.45762059816e-07
+Absolute error in flux:  1.08618242026e-07

@@ -1,0 +1,303 @@
+\documentclass[11pt,a4paper,english]{article}
+\usepackage[english]{babel} % Using babel for hyphenation
+\usepackage{lmodern} % Changing the font
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+%\usepackage[moderate]{savetrees} % [subtle/moderate/extreme] really compact writing
+\usepackage{tcolorbox}
+\tcbuselibrary{hooks}
+\usepackage[parfill]{parskip} % Removes indents
+\usepackage{amsmath} % Environment, symbols etc...
+\usepackage{amssymb}
+\usepackage{framed}
+\usepackage{float} % Fixing figure locations
+\usepackage{multirow} % For nice tables
+%\usepackage{wasysym} % Astrological symbols
+\usepackage{graphicx} % For pictures etc...
+\usepackage{enumitem} % Points/lists
+\usepackage{physics} % Typesetting of mathematical physics examples: 
+                     % \bra{}, \ket{}, expval{}
+\usepackage{url}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\newenvironment{algorithm}{%
+\refstepcounter{algcounter}
+\begin{tcolorbox}
+\centerline{Algorithm \thealgcounter}\vspace{2mm}
+}
+{\end{tcolorbox}}
+
+\definecolor{red}{RGB}{255,10,10}
+\definecolor{pink}{RGB}{255,20,147}
+
+% To include code(-snippets) with æøå
+\usepackage{listings}
+\lstset{
+language=c++,
+showspaces=false,
+showstringspaces=false,
+frame=l,
+}
+
+\tolerance = 5000 % Bedre tekst
+\hbadness = \tolerance
+\pretolerance = 2000
+
+\numberwithin{equation}{section}
+
+\newcommand{\conj}[1]{#1^*}
+\newcommand{\ve}[1]{\mathbf{#1}} % Vektorer i bold
+\let\oldhat\hat
+\renewcommand{\hat}[1]{\oldhat{#1}}
+\newcommand{\trans}[1]{#1^\top}
+\newcommand{\herm}[1]{#1^\dagger}
+%\renewcommand{\thefootnote}{\fnsymbol{footnote}} % Gir fotnote-symboler
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\bigO}[1]{\mathcal{O}\left( #1 \right)}
+
+\renewcommand{\thesection}{\Roman{section}} 
+\renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+
+\newcommand{\spac}{\hspace{5mm}}
+
+\newcounter{algcounter}
+\newcommand{\algnum}{\stepcounter{algcounter}\Roman{algcounter}}
+
+\title{MEK4300\\Mandatory assignment 1}
+\author{Krister Stræte Karlsen}
+\date{\today}
+
+\begin{document}
+\tcbset{before app=\parfillskip0pt}
+\maketitle
+
+\section{Poiseuille flow through ducts}
+
+Poiseuille flow through ducts are goverened by the equation 
+\begin{equation}
+\Delta u = -\frac{1}{\mu}\left( \frac{dp}{dx} \right)_0  
+\end{equation}
+with no-slip on the boundaries.  
+
+We will see if we can verify the analytical solutions (3-47), (3-49) and (3-52) in White using FEniCS and experiment with higher order elements and compute the \texttt{errornorm}. 
+
+Results obtained from experimenting with mesh densities and function spaces for the triangle duct flow
+
+\begin{table}[H]
+\centering
+\caption{Mesh density($h$), error($E$) and convergence rate from comparing the numerical solution(FEniCS) with the analytic solution in White for the velocity. }
+\vspace{3mm}
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+ \multicolumn{6}{|c|}{\textbf{Triangle}}   \\
+\hline
+ \multicolumn{3}{|c|}{ \textsc{1st order polynomial}} &  \multicolumn{3}{|c|}{\textsc{2nd order polynomial}}  \\
+\hline
+$h$ & $E$ & $r$ & $h$ & $E$ & $r$   \\
+\hline
+0.25718 & 0.00240 & 0.34159	& 0.25718 & 9.01820e-05 & 1.05622 \\
+0.12859 & 0.00060 & 2.00835	& 0.12859 & 1.21251e-05 & 2.89484 \\
+0.06430 & 0.00015 & 2.03221 & 0.06430 & 1.55805e-06 & 2.96018	\\ 
+\hline
+\end{tabular}
+\label{tab:time}
+\end{table}
+
+
+
+\begin{table}[H]
+\centering
+\caption{Mesh density($h$), error($E$) and convergence rate($r$) from comparing the numerical solution(FEniCS) with the analytic solution in White for the velocity. }
+\vspace{3mm}
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+ \multicolumn{6}{|c|}{\textbf{Ellipse}}   \\
+\hline
+ \multicolumn{3}{|c|}{ \textsc{1st order polynomial}} &  \multicolumn{3}{|c|}{\textsc{2nd order polynomial}}  \\
+\hline
+$h$ & $E$ & $r$ & $h$ & $E$ & $r$   \\
+\hline
+0.12117 & 1.61159e-05 & 1.81054 & 0.05915 & 2.10289e-05 & 1.88642 \\
+0.05728 & 3.92276e-06 & 1.88613 & 0.02860 & 5.23161e-06 & 1.91519 \\
+0.02940 & 9.72981e-07 & 2.09094 & 0.01398 & 1.29971e-06 & 1.94568 \\
+\hline
+\end{tabular}
+\label{tab:time}
+\end{table}
+
+
+\vspace{1.5cm}
+\begin{figure}[h!] 
+\begin{center}
+  \includegraphics[scale=0.18]{ducts.png}
+  \end{center}
+  \caption{Numerical solutions obtained using FEniCS corresponding to (3-47), (3-49) and (3-52) in White.}
+\end{figure}
+
+\section{Solving nonlinear equations using FEniCS}
+
+\textbf{Plane stagnation flow}
+
+\begin{equation}
+F''' + FF' + 1 - (F')^2 = 0
+\end{equation}
+with $F(0) = F'(0) = 0$ and $F'(\infty)=1$.
+
+\textbf{Axisymmetric stagnation flow}
+
+\begin{equation}
+F''' + 2FF' + 1 - (F')^2 = 0
+\end{equation}
+with $F(0) = F'(0) = 0$ and $F'(\infty)=1$.
+
+
+\section{Stokes flow for a driven cavity}
+Flows at very low Reynolds numbers are often called \emph{Stokes flow} and are governed by the equations 
+\begin{equation}
+\mu \nabla^2 \mathbf{u} = \nabla p
+\end{equation}
+\begin{equation}
+\nabla \cdot \mathbf{u} = 0.
+\end{equation}
+
+We will have a look at Stokes flow for a driven cavity in the domain $\Omega = [0,1] \cross [0,1]$ where the top wall i moving with velocity $\mathbf{u} = (1,0)$ and the remaining three walls are at rest. For a graphical interpretation of the problem see Figure \ref{fig:stokes_square}. FEniCS well be used to compute the solution. 
+
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.4]{stokes_square.png}
+  \end{center}
+  \caption{Illustration of the problem(iii) and the domain.}
+  \label{fig:stokes_square}
+\end{figure}
+
+To solve this problem using FEniCS we need the variational formulation, which for this problem is
+\begin{equation}
+\mu \int_\Omega \nabla \mathbf{v}:\nabla \mathbf{u} dx = \int_\Omega p \nabla \cdot \mathbf{v} dx 
+\end{equation}
+\begin{equation}
+\mu \int_\Omega p\nabla \cdot \mathbf{u} dx = 0.
+\end{equation}
+
+This variational formulation involves both a scalar test function $q$, and a vector test function $\mathbf{v}$. We will solve this as a coupled problem using \emph{Taylor-Hood elements}; A an triangular element commonly used for Stokes flow where the velocity is approximated by a polynomial of higher degree than the pressure. 
+
+\vspace{1.5cm}
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.5]{psi_square.png}
+  \end{center}
+  \caption{Plot of the stream function with contour lines for driven cavity flow.}
+\end{figure}
+
+We want to see if we can locate the center of a vortex in the cavity flow by computing the stream function $\psi$ , and see where it goes through a minimum. The stream function can be computed in similar manner, by using a variational formulation,  
+\begin{equation}
+-\int_\Omega \nabla \phi \cdot \nabla \psi dx + \int_{\partial \Omega} \phi \nabla \psi \cdot \mathbf{n} ds = - \int_\Omega \phi \omega dx.
+\end{equation}
+
+However, in this case the integral over the boundary is dropped as the boundary conditions are Dirichlet and enforced in FEniCS.
+A contour plot of the stream function is featured in Figure 3 and the exact location of the vortex was computed to be 
+
+\texttt{[x,y] =  [0.50133195 , 0.76516977].}
+
+The results obtained by minimizing the stream function seems to be in agreement with the "by-the-eye-approach" of looking at fig. 3.  
+
+
+\newpage
+\section{Stokes flow past a step}
+
+We will here look at a model for Stokes flow past a step with a moving top plate. See figure 4.
+
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.4]{stokes_step.png}
+  \end{center}
+  \caption{Illustration of the problem(iv) and the domain.}
+\end{figure}
+
+Now, with an inlet and an outlet in our domain, we need some boundary conditions allowing fluid to flow through the boundaries. A good choice is something called a \emph{pseudo-traction boundary condition}. It is really nothing but a trick to let fluid enter and exit the domain with little interference of the boundary, and it is implemented my simply doing nothing. 
+
+Another choice of boundary condition could be a linear velocity profile at the entrance and fixed pressure at the exit. Such conditions would make sense if the distance between the entrance and the step was big and the exit were really an exit into another fluid where the pressure was known. 
+
+I implemented both and noticed little or no difference. 
+
+\textbf{(a) Vortex}
+
+The vortex location is hunted down in similar manner this time. The only difference now is that we must include a boundary term in the variational form since we have no Dirichlet conditions to enforce.
+
+The obtained location is 
+
+\texttt{[x,y] =  [ 0.43455854 , 0.03908434],} \\
+
+and again in agreement with the graphics produced in ParaView. See Figure 5. 
+
+
+\textbf{(b) The stream function}
+
+The stream function was computed and a contour plot made using ParaView. Only the lowest contour lines were kept to make the data of interest easily observable. See figure 5. 
+
+\vspace{1.5cm}
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.35]{psi_step.png}
+  \end{center}
+  \caption{Contours in lowest range of values for the stream function.}
+\end{figure}
+
+\textbf{(c) Flux and conservation of mass}
+
+\noindent
+\texttt{Inlet flux:  -0.216791938563} \\
+\texttt{Outlet flux:  0.216791938563} \\
+\texttt{Difference in influx/outflux: -1.16573417586e-15}
+
+
+\textbf{(d) Reversed direction of flow}
+
+COMMENT ON WHY REVERSE DONT MATTER
+
+Location of vortex(reversed) [x,y]:  [0.43455854] [ 0.03908434]
+
+\begin{figure*}[t!]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \includegraphics[scale=0.21]{vel_step1.png}
+        \caption{Full velocity field.}
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}[b]{0.5\textwidth} 
+        \centering
+        \includegraphics[scale=0.14]{vel_step2.png}
+        \caption{Zoomed in a vortex can be observed.}
+    \end{subfigure}
+    \caption{Velocity field of Stokes flow past a step computed using FEniCS.}
+\end{figure*}
+
+
+\vspace{1.5cm}
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.25]{reverse_velstep.png}
+  \end{center}
+  \caption{Velocity field for flow in the opposite direction.}
+\end{figure}
+
+
+\textbf{(e) Normal stress on wall} \\
+
+The stress in a viscous fluid is given by 
+\begin{equation}
+\tau = -pI + \mu (\nabla \mathbf{u}  + \nabla \mathbf{u}^T  ) = pressure + \textit{shear stress}. 
+\end{equation}
+
+The shear stress does not contribute to normal stress so we get get this simple expression for the normal stress
+\begin{align*}
+\int_{S} (-p I \cdot \mathbf{n} ) \cdot \mathbf{n} \quad ds
+\end{align*}
+
+\texttt{Normal stress:  132.813411229} \\
+\texttt{Normal stress(reversed):  132.813411229 }
+
+\end{document}
