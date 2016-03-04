@@ -78,7 +78,7 @@ frame=l,
 
 Poiseuille flow through ducts are goverened by the equation 
 \begin{equation}
-\Delta u = -\frac{1}{\mu}\left( \frac{dp}{dx} \right)_0  
+\nabla^2 u = -\frac{1}{\mu}\left( \frac{dp}{dx} \right)_0  
 \end{equation}
 with no-slip on the boundaries.  
 
@@ -141,18 +141,55 @@ $h$ & $E$ & $r$ & $h$ & $E$ & $r$   \\
 
 \textbf{Plane stagnation flow}
 
+The equation for plane stagnation flow can be written as
 \begin{equation}
 F''' + FF' + 1 - (F')^2 = 0
 \end{equation}
 with $F(0) = F'(0) = 0$ and $F'(\infty)=1$.
 
+This nonlinear equation can be solved as a system of equations using a variational formulation and a mixed function space. We get the following system by letting $H=F'$
+\begin{align}
+H - F' = 0, \\
+H'' + FH' + 1 - H^2 = 0.
+\end{align}
+We must then find $F,H \in V \cross Q$ such that 
+\begin{align*}
+\int_\Omega v_h(H - F') dx =0 \quad \forall \quad v_h \in V, \\
+\int_\Omega v_f(H'' + FH' + 1 - H^2) dx = 0 \quad \forall \quad  v_f \in Q.
+\end{align*}
+To obtain a weak formulation we can just integrate the first term in the second equation by parts. 
+
+This equation is trivially solved with Newtons method in FEniCS.
+
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.4]{plane_stag.png}
+  \end{center}
+  \caption{Plot of the equation for plane stagnation flow.}
+  \label{fig:stokes_square}
+\end{figure}
+
+To solve this equation using Picard iterations in FEniCS we need an initial guess of $F$. A good guess can be  for instance $x$, as it obeys two of the boundary conditions and looks like the shape of $F$ when $x$ becomes large.   
+
+In Figure 2 we can see that both Newtons method and Picard give very similar solutions that obey the boundary conditions. The slope of the solution rapidly approaches $1$ as we would expect it too.     
+
 \textbf{Axisymmetric stagnation flow}
 
+The equation for axisymmetric stagnation flow can be written as
 \begin{equation}
 F''' + 2FF' + 1 - (F')^2 = 0
 \end{equation}
 with $F(0) = F'(0) = 0$ and $F'(\infty)=1$.
 
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.4]{axisym_stag.png}
+  \end{center}
+  \caption{Plot of the equation for axisymmetric stagnation flow}
+  \label{fig:stokes_square}
+\end{figure}
+
+We solve this equation in similar manner and the solution we obtain is of the same shape as for plane stagnation flow, see Figure 3. That comes as no surprise as the equation only differs by a factor of 2 in on of the terms.   
 
 \section{Stokes flow for a driven cavity}
 Flows at very low Reynolds numbers are often called \emph{Stokes flow} and are governed by the equations 
