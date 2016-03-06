@@ -79,8 +79,7 @@ def Picard_met():
 
 	Hstar = interpolate(Expression('x[0]'),FunctionSpace(mesh,'Lagrange',3))
 
-	epsilon = 1
-	i = 0
+	epsilon = 1; i = 0
 
 	Eq1 = H*vf*dx - F.dx(0)*vf*dx
 	Eq2	 = - inner(grad(H),grad(vh))*dx + F*Hstar.dx(0)*vh*dx + vh*dx - H*Hstar*vh*dx 

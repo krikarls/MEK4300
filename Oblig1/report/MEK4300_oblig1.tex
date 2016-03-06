@@ -66,7 +66,7 @@ frame=l,
 \newcounter{algcounter}
 \newcommand{\algnum}{\stepcounter{algcounter}\Roman{algcounter}}
 
-\title{MEK4300\\Mandatory assignment 1}
+\title{MEK4300 - Mandatory assignment 1}
 \author{Krister Stræte Karlsen}
 \date{\today}
 
@@ -83,6 +83,13 @@ Poiseuille flow through ducts are goverened by the equation
 with no-slip on the boundaries.  
 
 We will see if we can verify the analytical solutions (3-47), (3-49) and (3-52) in White using FEniCS and experiment with higher order elements and compute the \texttt{errornorm}. 
+
+\begin{figure}[h!] 
+\begin{center}
+  \includegraphics[scale=0.18]{ducts.png}
+  \end{center}
+  \caption{Numerical solutions obtained using FEniCS corresponding to (3-47), (3-49) and (3-52) in White.}
+\end{figure}
 
 Results obtained from experimenting with mesh densities and function spaces for the triangle duct flow
 
@@ -129,14 +136,6 @@ $h$ & $E$ & $r$ & $h$ & $E$ & $r$   \\
 \end{table}
 
 
-\vspace{1.5cm}
-\begin{figure}[h!] 
-\begin{center}
-  \includegraphics[scale=0.18]{ducts.png}
-  \end{center}
-  \caption{Numerical solutions obtained using FEniCS corresponding to (3-47), (3-49) and (3-52) in White.}
-\end{figure}
-
 \section{Solving nonlinear equations using FEniCS}
 
 \textbf{Plane stagnation flow}
@@ -169,7 +168,7 @@ This equation is trivially solved with Newtons method in FEniCS.
   \label{fig:stokes_square}
 \end{figure}
 
-To solve this equation using Picard iterations in FEniCS we need an initial guess of $F$. A good guess can be  for instance $x$, as it obeys two of the boundary conditions and looks like the shape of $F$ when $x$ becomes large.   
+To solve this equation using Picard iterations in FEniCS we need an initial guess $F_0$ and iterate until the difference, $\epsilon$ between the guess and $F$ becomes sufficiently small. A good guess can be  for instance $x$, as it obeys two of the boundary conditions and looks like the shape of $F$ when $x$ becomes large.   
 
 In Figure 2 we can see that both Newtons method and Picard give very similar solutions that obey the boundary conditions. The slope of the solution rapidly approaches $1$ as we would expect it too.     
 
@@ -204,7 +203,7 @@ We will have a look at Stokes flow for a driven cavity in the domain $\Omega = [
 
 \begin{figure}[h!]
 \begin{center}
-  \includegraphics[scale=0.4]{stokes_square.png}
+  \includegraphics[scale=0.3]{stokes_square.png}
   \end{center}
   \caption{Illustration of the problem(iii) and the domain.}
   \label{fig:stokes_square}
@@ -220,10 +219,9 @@ To solve this problem using FEniCS we need the variational formulation, which fo
 
 This variational formulation involves both a scalar test function $q$, and a vector test function $\mathbf{v}$. We will solve this as a coupled problem using \emph{Taylor-Hood elements}; A an triangular element commonly used for Stokes flow where the velocity is approximated by a polynomial of higher degree than the pressure. 
 
-\vspace{1.5cm}
 \begin{figure}[h!]
 \begin{center}
-  \includegraphics[scale=0.5]{psi_square.png}
+  \includegraphics[scale=0.4]{psi_square.png}
   \end{center}
   \caption{Plot of the stream function with contour lines for driven cavity flow.}
 \end{figure}
@@ -233,7 +231,7 @@ We want to see if we can locate the center of a vortex in the cavity flow by com
 -\int_\Omega \nabla \phi \cdot \nabla \psi dx + \int_{\partial \Omega} \phi \nabla \psi \cdot \mathbf{n} ds = - \int_\Omega \phi \omega dx.
 \end{equation}
 
-However, in this case the integral over the boundary is dropped as the boundary conditions are Dirichlet and enforced in FEniCS.
+However, in this case the integral over the boundary is dropped as the boundary conditions are Dirichlet.
 A contour plot of the stream function is featured in Figure 3 and the exact location of the vortex was computed to be 
 
 \texttt{[x,y] =  [0.50133195 , 0.76516977].}
@@ -241,14 +239,13 @@ A contour plot of the stream function is featured in Figure 3 and the exact loca
 The results obtained by minimizing the stream function seems to be in agreement with the "by-the-eye-approach" of looking at fig. 3.  
 
 
-\newpage
 \section{Stokes flow past a step}
 
 We will here look at a model for Stokes flow past a step with a moving top plate. See figure 4.
 
 \begin{figure}[h!]
 \begin{center}
-  \includegraphics[scale=0.4]{stokes_step.png}
+  \includegraphics[scale=0.3]{stokes_step.png}
   \end{center}
   \caption{Illustration of the problem(iv) and the domain.}
 \end{figure}
@@ -265,61 +262,55 @@ The vortex location is hunted down in similar manner this time. The only differe
 
 The obtained location is 
 
-\texttt{[x,y] =  [ 0.43455854 , 0.03908434],} \\
+\texttt{[x,y] =  [0.43455854 , 0.03908434],} \\
 
 and again in agreement with the graphics produced in ParaView. See Figure 5. 
 
 
 \textbf{(b) The stream function}
 
-The stream function was computed and a contour plot made using ParaView. Only the lowest contour lines were kept to make the data of interest easily observable. See figure 5. 
+The stream function was computed and a contour plot made using ParaView. Only the lowest value contours were kept to make the data of interest easily observable. See figure 5. 
 
-\vspace{1.5cm}
 \begin{figure}[h!]
 \begin{center}
-  \includegraphics[scale=0.35]{psi_step.png}
+  \includegraphics[scale=0.30]{psi_step.png}
   \end{center}
   \caption{Contours in lowest range of values for the stream function.}
 \end{figure}
 
 \textbf{(c) Flux and conservation of mass}
 
+The flux, given by 
+\begin{align*}
+Q = \int_{\Gamma} u dA,
+\end{align*}
+is computed in FEniCS over the inlet and the outlet to be:
+
 \noindent
 \texttt{Inlet flux:  -0.216791938563} \\
 \texttt{Outlet flux:  0.216791938563} \\
 \texttt{Difference in influx/outflux: -1.16573417586e-15}
 
+Mass seems to be conserved. 
+
 
 \textbf{(d) Reversed direction of flow}
 
-COMMENT ON WHY REVERSE DONT MATTER
+Reversing the direction of the flow we find the same location for the vortex:
 
-Location of vortex(reversed) [x,y]:  [0.43455854] [ 0.03908434]
+\texttt{Location of vortex(reversed) [x,y]:  [0.43455854 , 0.03908434] }
 
-\begin{figure*}[t!]
-    \centering
-    \begin{subfigure}[b]{0.5\textwidth}
-        \centering
-        \includegraphics[scale=0.21]{vel_step1.png}
-        \caption{Full velocity field.}
-    \end{subfigure}%
-    ~ 
-    \begin{subfigure}[b]{0.5\textwidth} 
-        \centering
-        \includegraphics[scale=0.14]{vel_step2.png}
-        \caption{Zoomed in a vortex can be observed.}
-    \end{subfigure}
-    \caption{Velocity field of Stokes flow past a step computed using FEniCS.}
-\end{figure*}
+Why this is, becomes very clear by looking at the equation for the stream function. Here assuming a 2D case.
+\begin{align*}
+\nabla \psi = \partial_x \psi + \partial_y = -v \mathbf{i} + u \mathbf{j} \\
+\nabla \cdot \nabla \psi = \nabla^2 \psi = -\partial_x v + \partial_y u = -\omega 
+\end{align*} 
+Now, taking the curl of equation (III.1) we find that $\nabla^2 \omega= 0$. Inserting this into the last equation above we obtain a \emph{biharmonic equation} for $\psi$, 
+\begin{align*}
+\nabla^4 \psi = 0.
+\end{align*} 
+It is now easy to understand that if $\psi$ is a solution, then $-\psi$ must be a solution as well. Only the flow direction in the vortex is changed, see Figure  8-9 on the last page.  
 
-
-\vspace{1.5cm}
-\begin{figure}[h!]
-\begin{center}
-  \includegraphics[scale=0.25]{reverse_velstep.png}
-  \end{center}
-  \caption{Velocity field for flow in the opposite direction.}
-\end{figure}
 
 
 \textbf{(e) Normal stress on wall} \\
@@ -331,10 +322,40 @@ The stress in a viscous fluid is given by
 
 The shear stress does not contribute to normal stress so we get get this simple expression for the normal stress
 \begin{align*}
-\int_{S} (-p I \cdot \mathbf{n} ) \cdot \mathbf{n} \quad ds
+\int_{S} (-p I \cdot \mathbf{n} ) \cdot \mathbf{n} \quad ds.
 \end{align*}
 
 \texttt{Normal stress:  132.813411229} \\
 \texttt{Normal stress(reversed):  132.813411229 }
+
+\newpage
+
+
+\begin{figure*}[t!]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \includegraphics[scale=0.25]{vel_step1.png}
+        \caption{Full velocity field.}
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}[b]{0.5\textwidth} 
+        \centering
+        \includegraphics[scale=0.18]{vel_step2.png}
+        \caption{Zoomed in a vortex can be observed.}
+    \end{subfigure}
+    \caption{Velocity field of Stokes flow past a step computed using FEniCS.}
+\end{figure*}
+
+
+\vspace{1.5cm}
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.28]{reverse_velstep.png}
+  \end{center}
+  \caption{Velocity field for flow in the opposite direction.}
+\end{figure}
+
+
 
 \end{document}
