@@ -91,7 +91,7 @@ We will see if we can verify the analytical solutions (3-47), (3-49) and (3-52) 
   \caption{Numerical solutions obtained using FEniCS corresponding to (3-47), (3-49) and (3-52) in White.}
 \end{figure}
 
-Results obtained from experimenting with mesh densities and function spaces for the triangle duct flow
+Results obtained from experimenting with mesh densities and function spaces are found in Table 1-3.
 
 \begin{table}[H]
 \centering
@@ -188,7 +188,7 @@ with $F(0) = F'(0) = 0$ and $F'(\infty)=1$.
   \label{fig:stokes_square}
 \end{figure}
 
-We solve this equation in similar manner and the solution we obtain is of the same shape as for plane stagnation flow, see Figure 3. That comes as no surprise as the equation only differs by a factor of 2 in on of the terms.   
+We solve this equation in similar manner and the solution we obtain is of the same shape as for plane stagnation flow, see Figure 3. That comes as no surprise as the equation only differs by a factor of 2 in one of the terms.   
 
 \section{Stokes flow for a driven cavity}
 Flows at very low Reynolds numbers are often called \emph{Stokes flow} and are governed by the equations 
@@ -236,12 +236,12 @@ A contour plot of the stream function is featured in Figure 3 and the exact loca
 
 \texttt{[x,y] =  [0.50133195 , 0.76516977].}
 
-The results obtained by minimizing the stream function seems to be in agreement with the "by-the-eye-approach" of looking at fig. 3.  
+The results obtained by minimizing the stream function seems to be in agreement with the "by-the-eye-approach" of looking at Figure 5.  
 
 
 \section{Stokes flow past a step}
 
-We will here look at a model for Stokes flow past a step with a moving top plate. See figure 4.
+We will here look at a model for Stokes flow past a step with a moving top plate. See figure 6.
 
 \begin{figure}[h!]
 \begin{center}
@@ -260,16 +260,32 @@ I implemented both and noticed little or no difference.
 
 The vortex location is hunted down in similar manner this time. The only difference now is that we must include a boundary term in the variational form since we have no Dirichlet conditions to enforce.
 
-The obtained location is 
+The obtained location as a function of mesh density is presented in Table 4.
 
-\texttt{[x,y] =  [0.43455854 , 0.03908434],} \\
+\begin{table}[H]
+\centering
+\caption{ Mesh density(\texttt{mesh.hmin()}) and vortex location. }
+\vspace{3mm}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Mesh density} & \textbf{Vortex location}    \\
+\hline
+0.009893 & [0.43550429 , 0.03588525]   \\
+\hline
+0.004946 & [0.43455854 , 0.03908434]	   \\
+\hline
+0.002473 & [0.43455854 , 0.03908434]    \\ 
+\hline
+\end{tabular}
+\label{tab:time}
+\end{table}
 
-and again in agreement with the graphics produced in ParaView. See Figure 5. 
+The computed location of the vortex rapidly approaches $[x,y] \simeq [0.43, 0.04]$ as the mesh is refined. These results are in agreement with the graphics produced in ParaView. See Figure 7. 
 
 
 \textbf{(b) The stream function}
 
-The stream function was computed and a contour plot made using ParaView. Only the lowest value contours were kept to make the data of interest easily observable. See figure 5. 
+The stream function was computed and a contour plot made using ParaView. Only the lowest value contours were kept to make the data of interest easily observable. See figure 7. 
 
 \begin{figure}[h!]
 \begin{center}
@@ -325,9 +341,12 @@ The shear stress does not contribute to normal stress so we get get this simple 
 \int_{S} (-p I \cdot \mathbf{n} ) \cdot \mathbf{n} \quad ds.
 \end{align*}
 
-\texttt{Normal stress:  132.813411229} \\
-\texttt{Normal stress(reversed):  132.813411229 }
+The results we get from computing the normal stress for both directions are:
 
+\texttt{Normal stress:  132.813411229} \\
+\texttt{Normal stress(reversed):  -132.813411229 }
+
+Only the sign differs for the different flow directions. 
 \newpage
 
 
