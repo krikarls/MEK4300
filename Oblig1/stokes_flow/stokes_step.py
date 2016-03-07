@@ -6,7 +6,7 @@ mesh = Mesh("step.xml")
 
 zero_velocity = Expression(("0.0", "0.0"))
 upper_velocity = Expression(("1.0", "0.0"))
-upper_velocity = Expression(("-1.0", "0.0"))  # use for reversed velocity
+#upper_velocity = Expression(("-1.0", "0.0"))  # use for reversed velocity
 
 # Define function spaces
 V = VectorFunctionSpace(mesh, "CG", 2)
